@@ -1,6 +1,6 @@
 package com.jsuereth.sbtpgp
 
-import sbt._
+import sbt.{ given, * }
 import sbt.sbtpgp.Compat._
 
 /**

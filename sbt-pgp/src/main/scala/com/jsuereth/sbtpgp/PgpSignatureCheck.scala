@@ -57,7 +57,7 @@ object PgpSignatureCheck {
     def signatureArtifacts(m: ModuleID): Option[ModuleID] = {
       // TODO - Some kind of filtering
       // TODO - We *can't* assume everything is a jar
-      def signatureFor(artifact: Artifact) = Seq(artifact, subExtension(artifact, artifact.extension + gpgExtension))
+      def signatureFor(artifact: Artifact) = Seq(artifact, artifact.withExtension(artifact.extension + gpgExtension))
       // Assume no explicit artifact = "jar" artifact.
       if (m.explicitArtifacts.isEmpty)
         Some(
@@ -76,13 +76,24 @@ object PgpSignatureCheck {
     val module = new ivySbt.Module(
       mkInlineConfiguration(base, deps, ivyScala, confs.toVector)
     )
-    val upConf = subMissingOk(c, true)
+    val upConf = c.withMissingOk(true)
 
     updateEither(module, upConf, UnresolvedWarningConfiguration(), LogicalClock.unknown, None, log) match {
       case Right(r) => r
       case Left(w)  => throw w.resolveException
     }
   }
+
+  def mkInlineConfiguration(
+      base: ModuleID,
+      deps: Vector[ModuleID],
+      ivyScala: Option[IvyScala],
+      confs: Vector[Configuration]
+  ): InlineConfiguration =
+    ModuleDescriptorConfiguration(base, ModuleInfo(base.name))
+      .withDependencies(deps)
+      .withScalaModuleInfo(ivyScala)
+      .withConfigurations(confs)
 
   def checkSignaturesTask(update: UpdateReport, pgp: PgpVerifierFactory, s: TaskStreams): SignatureCheckReport = {
     val report = SignatureCheckReport(checkArtifactSignatures(update, pgp, s) ++ missingSignatures(update, s))

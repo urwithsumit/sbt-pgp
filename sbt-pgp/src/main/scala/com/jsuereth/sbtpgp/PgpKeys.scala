@@ -2,7 +2,7 @@ package com.jsuereth.sbtpgp
 
 import sbt._
 import com.jsuereth.pgp._
-import sbt.sbtpgp.Compat._
+import sbt.sbtpgp.Compat, Compat._
 
 /** SBT Keys for the PGP plugin. */
 object PgpKeys {
@@ -46,9 +46,7 @@ object PgpKeys {
   val publishSignedConfiguration = taskKey[PublishConfiguration]("Configuration for publishing to a repository.")
   val publishLocalSignedConfiguration =
     taskKey[PublishConfiguration]("Configuration for publishing to the local repository.")
-  val signedArtifacts = taskKey[Map[Artifact, File]](
-    "Packages all artifacts for publishing and maps the Artifact definition to the generated file."
-  )
+  val signedArtifacts = Compat.signedArtifacts
   val publishSigned = taskKey[Unit]("Publishing all artifacts, but SIGNED using PGP.")
   val publishLocalSigned = taskKey[Unit]("Publishing all artifacts to a local repository, but SIGNED using PGP.")
   val pgpMakeIvy = taskKey[Option[File]]("Generates the Ivy file.")
