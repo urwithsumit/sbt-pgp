@@ -6,6 +6,8 @@ import org.bouncycastle.bcpg._
 import org.bouncycastle.openpgp._
 import org.bouncycastle.openpgp.operator.jcajce.JcaKeyFingerprintCalculator
 
+import scala.collection.JavaConverters._
+
 /** A collection of public keys, known as a 'ring'. */
 class PublicKeyRing(val nested: PGPPublicKeyRing) extends PublicKeyLike with StreamingSaveable {
 
@@ -28,12 +30,10 @@ class PublicKeyRing(val nested: PGPPublicKeyRing) extends PublicKeyLike with Str
 
   /** A collection that will traverse all public keys in this key ring. */
   def publicKeys = new Traversable[PublicKey] {
-    def foreach[U](f: PublicKey => U): Unit = {
-      val it = nested.getPublicKeys
-      while (it.hasNext) {
-        f(PublicKey(it.next.asInstanceOf[PGPPublicKey]))
-      }
-    }
+    override def foreach[U](f: PublicKey => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[PublicKey] =
+      nested.getPublicKeys.asScala.map(PublicKey.apply)
   }
   def masterKey = publicKeys find (_.isMasterKey)
 

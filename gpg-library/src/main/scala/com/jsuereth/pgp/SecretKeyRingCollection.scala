@@ -6,15 +6,17 @@ import org.bouncycastle.bcpg._
 import org.bouncycastle.openpgp._
 import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator
 
+import scala.collection.JavaConverters._
+
 /** A secret PGP key ring. Can be used to decrypt messages and to sign files/messages.  */
 class SecretKeyRingCollection(val nested: PGPSecretKeyRingCollection) extends StreamingSaveable {
 
   /** A collection of all the nested secret key rings. */
   object keyRings extends Traversable[SecretKeyRing] {
-    def foreach[U](f: SecretKeyRing => U): Unit = {
-      val i = nested.getKeyRings
-      while (i.hasNext) f(SecretKeyRing(i.next.asInstanceOf[PGPSecretKeyRing]))
-    }
+    override def foreach[U](f: SecretKeyRing => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[SecretKeyRing] =
+      nested.getKeyRings.asScala.map(SecretKeyRing.apply)
   }
 
   /** A collection of all the secret keys from all the key rings. */

@@ -6,15 +6,17 @@ import java.io.{ InputStream, OutputStream }
 
 import org.bouncycastle.openpgp.operator.bc.BcKeyFingerprintCalculator
 
+import scala.collection.JavaConverters._
+
 /** A collection of nested key rings. */
 class PublicKeyRingCollection(val nested: PGPPublicKeyRingCollection) extends PublicKeyLike with StreamingSaveable {
 
   /** A collection of all the nested key rings. */
   object keyRings extends Traversable[PublicKeyRing] {
-    def foreach[U](f: PublicKeyRing => U): Unit = {
-      val i = nested.getKeyRings
-      while (i.hasNext) f(PublicKeyRing(i.next.asInstanceOf[PGPPublicKeyRing]))
-    }
+    override def foreach[U](f: PublicKeyRing => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[PublicKeyRing] =
+      nested.getKeyRings.asScala.map(PublicKeyRing.apply)
   }
 
   /** A collection of all the public keys from all the key rings. */

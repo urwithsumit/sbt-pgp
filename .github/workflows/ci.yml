@@ -17,6 +17,10 @@ jobs:
             distribution: temurin
             jobtype: 2
           - os: ubuntu-latest
+            java: 11
+            distribution: temurin
+            jobtype: 3
+          - os: ubuntu-latest
             java: 8
             distribution: temurin
             jobtype: 1
@@ -49,3 +53,7 @@ jobs:
       if: ${{ matrix.jobtype == 2 }}
       shell: bash
       run: sbt -v clean scalafmtSbtCheck +scalafmtCheckAll
+    - name: Scala 3
+      if: ${{ matrix.jobtype == 3 }}
+      shell: bash
+      run: sbt -v '++ 3.3.4!' library/test
