@@ -7,6 +7,8 @@ import java.security.{ Security, SecureRandom }
 
 import org.bouncycastle.openpgp.operator.jcajce.{ JcePublicKeyKeyEncryptionMethodGenerator, JcePGPDataEncryptorBuilder }
 
+import scala.collection.JavaConverters._
+
 /** This class represents a public PGP key. It can be used to encrypt messages for a person and validate that messages were signed correctly. */
 class PublicKey(val nested: PGPPublicKey) extends PublicKeyLike with StreamingSaveable {
 
@@ -30,28 +32,24 @@ class PublicKey(val nested: PGPPublicKey) extends PublicKeyLike with StreamingSa
 
   /** Returns the userIDs associated with this public key. */
   object userIDs extends Traversable[String] {
-    def foreach[U](f: String => U) = {
-      val i = nested.getUserIDs
-      while (i.hasNext) f(i.next.toString)
-    }
+    override def foreach[U](f: String => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[String] =
+      nested.getUserIDs.asScala
   }
 
   object signatures extends Traversable[Signature] {
-    override def foreach[U](f: Signature => U): Unit = {
-      val i = nested.getSignatures()
-      while (i.hasNext) {
-        f(Signature(i.next.asInstanceOf[PGPSignature]))
-      }
-    }
+    override def foreach[U](f: Signature => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[Signature] =
+      nested.getSignatures().asScala.map(Signature.apply)
   }
 
   def signaturesForId(id: String): Traversable[Signature] = new Traversable[Signature] {
-    override def foreach[U](f: Signature => U): Unit = {
-      val i = nested.getSignaturesForID(id)
-      while (i.hasNext) {
-        f(Signature(i.next.asInstanceOf[PGPSignature]))
-      }
-    }
+    override def foreach[U](f: Signature => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[Signature] =
+      nested.getSignaturesForID(id).asScala.map(Signature.apply)
   }
 
   def directKeySignatures: Traversable[Signature] =

@@ -40,13 +40,14 @@ lazy val plugin = (project in file("sbt-pgp"))
   .dependsOn(library)
   .settings(
     name := "sbt-pgp",
-    libraryDependencies += gigahorseOkhttp,
+    libraryDependencies += gigahorseOkhttp.value,
     publishLocal := publishLocal.dependsOn((library / publishLocal)).value,
     scriptedBufferLog := false,
     scriptedLaunchOpts += s"-Dproject.version=${version.value}",
     (pluginCrossBuild / sbtVersion) := {
       scalaBinaryVersion.value match {
         case "2.12" => "1.2.8"
+        case _      => "2.0.0-M2"
       }
     }
   )
@@ -57,8 +58,8 @@ lazy val plugin = (project in file("sbt-pgp"))
 lazy val library = (project in file("gpg-library"))
   .settings(
     name := "pgp-library",
-    libraryDependencies ++= Seq(bouncyCastlePgp, gigahorseOkhttp, specs2 % Test, sbtIo % Test),
-    libraryDependencies ++= Seq(parserCombinators)
+    libraryDependencies ++= Seq(bouncyCastlePgp, gigahorseOkhttp.value, specs2 % Test, sbtIo % Test),
+    libraryDependencies ++= Seq(parserCombinators.value)
   )
 
 ThisBuild / scmInfo := Some(

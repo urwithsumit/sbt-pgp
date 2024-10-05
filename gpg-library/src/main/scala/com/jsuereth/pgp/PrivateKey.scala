@@ -15,6 +15,8 @@ import org.bouncycastle.openpgp.operator.jcajce.{
   JcePublicKeyDataDecryptorFactoryBuilder
 }
 
+import scala.collection.JavaConverters._
+
 class IncorrectPassphraseException(msg: String, cause: Throwable) extends RuntimeException(msg, cause)
 
 /** A SecretKey that can be used to sign things and decrypt messages. */
@@ -267,10 +269,10 @@ class SecretKey(val nested: PGPSecretKey) {
     }
 
   def userIDs = new Traversable[String] {
-    def foreach[U](f: String => U) = {
-      val i = nested.getUserIDs
-      while (i.hasNext) f(i.next.toString)
-    }
+    override def foreach[U](f: String => U): Unit =
+      iterator.foreach(f)
+    def iterator: Iterator[String] =
+      nested.getUserIDs.asScala
   }
   override lazy val toString = "SecretKey(%x, %s)".format(nested.getKeyID, userIDs.mkString(","))
 }
