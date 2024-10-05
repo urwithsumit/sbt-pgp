@@ -18,7 +18,7 @@ case class SbtPgpCommandContext(
 
   // For binary compatibility
   def this(ctx: cli.PgpStaticContext, optPassphrase: Option[Array[Char]], s: TaskStreams) =
-    this(ctx, CommandLineUIServices, optPassphrase, s)
+    this(ctx, CommandLineUIService, optPassphrase, s)
 
   def readInput(msg: String): String = System.out.synchronized {
     interaction.readLine(msg, mask = false) getOrElse sys.error("Failed to grab input")
@@ -38,7 +38,7 @@ case class SbtPgpCommandContext(
         default = optPassphrase getOrElse inputPassphrase
       )(f)
     } match {
-      case Right(u) => u
+      case Right(u) => u.asInstanceOf[U]
       case Left(e) =>
         throw new IllegalArgumentException(
           s"Wrong passphrase for key ${key.toHexString.toUpperCase} in ${ctx.secretKeyRingFile.getAbsolutePath}: ${e.getMessage}. aborting...",

@@ -10,7 +10,8 @@ ThisBuild / Compile / scalacOptions := Seq("-feature", "-deprecation", "-Xlint")
 // Because we're both a library and an sbt plugin, we use crossScalaVersions rather than crossSbtVersions for
 // cross building. So you can use commands like +scripted.
 lazy val scala212 = "2.12.15"
-ThisBuild / crossScalaVersions := Seq(scala212)
+lazy val scala3 = "3.3.4"
+ThisBuild / crossScalaVersions := Seq(scala212, scala3)
 ThisBuild / scalaVersion := scala212
 
 ThisBuild / scalafmtOnCompile := true
@@ -46,7 +47,7 @@ lazy val plugin = (project in file("sbt-pgp"))
     scriptedLaunchOpts += s"-Dproject.version=${version.value}",
     (pluginCrossBuild / sbtVersion) := {
       scalaBinaryVersion.value match {
-        case "2.12" => "1.2.8"
+        case "2.12" => "1.5.8"
         case _      => "2.0.0-M2"
       }
     }

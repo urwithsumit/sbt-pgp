@@ -16,6 +16,9 @@ object PgpSettings {
   /** Settings this plugin defines. TODO - require manual setting of these... */
   lazy val projectSettings: Seq[Setting[_]] = signingSettings ++ verifySettings
 
+  def deliverPattern(outputPath: File): String =
+    (outputPath / "[artifact]-[revision](-[classifier]).[ext]").absolutePath
+
   /** Configuration for GPG command line */
   lazy val gpgConfigurationSettings: Seq[Setting[_]] = Seq(
     useGpg := {
@@ -136,30 +139,48 @@ object PgpSettings {
    * artifacts.   While this isn't as friendly to other plugins that want to
    * use our signed artifacts in normal publish flow, it should be more user friendly.
    */
-  lazy val signingSettings: Seq[Setting[_]] = Seq(
-    signedArtifacts := {
-      val artifacts = packagedArtifacts.value
-      val r = pgpSigner.value
-      val skipZ = (pgpSigner / skip).value
-      val s = streams.value
-      if (!skipZ) {
-        artifacts flatMap {
-          case (art, file) =>
-            Seq(
-              art -> file,
-              subExtension(art, art.extension + gpgExtension) -> r
-                .sign(file, new File(file.getAbsolutePath + gpgExtension), s)
-            )
-        }
-      } else artifacts
-    },
+  lazy val signingSettings: Seq[Setting[_]] = signingSettings0 ++ Seq(
     pgpMakeIvy := (Def.taskDyn {
       val style = publishMavenStyle.value
       if (style) Def.task { (None: Option[File]) } else Def.task { Option(deliver.value) }
     }).value,
-    publishSignedConfiguration := publishSignedConfigurationTask.value,
+    publishSignedConfiguration := {
+      val _ = pgpMakeIvy.value
+      val c = fileConverter.value
+      Classpaths.publishConfig(
+        publishMavenStyle.value,
+        deliverPattern(crossTarget.value),
+        if (isSnapshot.value) "integration" else "release",
+        ivyConfigurations.value.map(c => ConfigRef(c.name)).toVector,
+        PgpKeys.signedArtifacts.value.toVector.map {
+          case (a, x) =>
+            a -> toFile(x, c)
+        },
+        checksums = (publish / checksums).value.toVector,
+        resolverName = Classpaths.getPublishTo(publishTo.value).name,
+        logging = ivyLoggingLevel.value,
+        overwrite = publishConfiguration.value.overwrite
+      )
+    },
     publishSigned := publishSignedTask(publishSignedConfiguration, deliver).value,
-    publishLocalSignedConfiguration := publishLocalSignedConfigurationTask.value,
+    publishLocalSignedConfiguration := {
+      val _ = deliverLocal.value
+      val c = fileConverter.value
+      Classpaths.publishConfig(
+        publishMavenStyle.value,
+        deliverPattern(crossTarget.value),
+        if (isSnapshot.value) "integration" else "release",
+        ivyConfigurations.value.map(c => ConfigRef(c.name)).toVector,
+        PgpKeys.signedArtifacts.value.toVector.map {
+          case (a, x) =>
+            a -> toFile(x, c)
+        },
+        (publishLocal / checksums).value.toVector,
+        resolverName = "local",
+        logging = ivyLoggingLevel.value,
+        overwrite = publishConfiguration.value.overwrite
+      )
+    },
     publishLocalSigned := publishSignedTask(publishLocalSignedConfiguration, deliver).value
   )
 

@@ -20,7 +20,7 @@ case class SendKey(pubKey: String, hkpUrl: String) extends HkpCommand {
     val key = pubring findPubKeyRing pubKey getOrElse sys.error("Could not find public key: " + pubKey)
     val client = hkpClient
     log.info("Sending " + key + " to " + client)
-    client.pushKeyRing(key, { s: String =>
+    client.pushKeyRing(key, { (s: String) =>
       log.debug(s)
     })
   }

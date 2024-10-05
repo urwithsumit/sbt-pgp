@@ -48,7 +48,7 @@ jobs:
     - name: Build and test
       if: ${{ matrix.jobtype == 1 }}
       shell: bash
-      run: sbt -v clean +test +scripted
+      run: sbt -v clean test scripted
     - name: Scalafmt
       if: ${{ matrix.jobtype == 2 }}
       shell: bash
@@ -56,4 +56,4 @@ jobs:
     - name: Scala 3
       if: ${{ matrix.jobtype == 3 }}
       shell: bash
-      run: sbt -v '++ 3.3.4!' library/test
+      run: sbt -v '++ 3.3.4!' library/test scripted
