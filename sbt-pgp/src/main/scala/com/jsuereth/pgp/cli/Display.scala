@@ -6,7 +6,7 @@ object Display {
 
   def printFileHeader(f: java.io.File) = {
     val path = f.getAbsolutePath
-    val line = Stream.continually('-').take(path.length).mkString("")
+    val line = Iterator.continually('-').take(path.length).mkString("")
     path + "\n" + line + "\n"
   }
 
