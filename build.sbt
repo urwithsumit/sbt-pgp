@@ -82,7 +82,7 @@ ThisBuild / developers := List(
   )
 )
 ThisBuild / description := "sbt-pgp provides PGP signing for sbt"
-ThisBuild / licenses := List("BSD-3-Clause" -> new URL("https://github.com/sbt/sbt-pgp/blob/develop/LICENSE"))
+ThisBuild / licenses := List("BSD-3-Clause" -> url("https://github.com/sbt/sbt-pgp/blob/develop/LICENSE"))
 ThisBuild / pomIncludeRepository := { _ =>
   false
 }
