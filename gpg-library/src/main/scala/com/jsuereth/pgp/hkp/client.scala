@@ -50,20 +50,20 @@ private[hkp] class GigahorseClient(serverUrl: String) extends Client {
 
   /** Pushes a key to the given public key server. */
   def pushKey(key: PublicKey, logger: String => Unit): Unit =
-    http.run(initiateFormPost(AddKey(key)), Gigahorse.asString andThen { c: String =>
+    http.run(initiateFormPost(AddKey(key)), Gigahorse.asString andThen { (c: String) =>
       logger("received: " + c)
     })
 
   /** Pushes a key to the given public key server. */
   def pushKeyRing(key: PublicKeyRing, logger: String => Unit): Unit =
-    http.run(initiateFormPost(AddKey(key)), Gigahorse.asString andThen { c: String =>
+    http.run(initiateFormPost(AddKey(key)), Gigahorse.asString andThen { (c: String) =>
       logger("received: " + c)
     })
 
   /** Searches for a term on the keyserver and returns all the results. */
   def search(term: String): Future[Vector[LookupKeyResult]] =
     http
-      .run(initiateRequest(Find(term)), Gigahorse.asString andThen { s: String =>
+      .run(initiateRequest(Find(term)), Gigahorse.asString andThen { (s: String) =>
         Client.LookupParser.parse(s)
       })
       .recover {

@@ -74,7 +74,7 @@ class PublicKeyRingCollection(val nested: PGPPublicKeyRingCollection) extends Pu
   override def toString = "PublicKeyRingCollecton(\n\t%s\n)" format (keyRings mkString ",\n\t")
 }
 object PublicKeyRingCollection extends StreamingLoadable[PublicKeyRingCollection] {
-  implicit def unwrap(ring: PublicKeyRingCollection) = ring.nested
+  implicit def unwrap(ring: PublicKeyRingCollection): PGPPublicKeyRingCollection = ring.nested
   def apply(nested: PGPPublicKeyRingCollection) = new PublicKeyRingCollection(nested)
   def load(input: InputStream) =
     apply(new PGPPublicKeyRingCollection(PGPUtil.getDecoderStream(input), new BcKeyFingerprintCalculator))

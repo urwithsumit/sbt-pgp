@@ -140,5 +140,5 @@ class PublicKey(val nested: PGPPublicKey) extends PublicKeyLike with StreamingSa
 }
 object PublicKey {
   def apply(nested: PGPPublicKey) = new PublicKey(nested)
-  implicit def unwrap(key: PublicKey) = key.nested
+  implicit def unwrap(key: PublicKey): PGPPublicKey = key.nested
 }
