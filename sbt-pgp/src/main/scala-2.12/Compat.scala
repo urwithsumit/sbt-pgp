@@ -46,12 +46,12 @@ object Compat {
   )
 
   def signingSettings0: Seq[Setting[_]] = Seq(
+    // conditional
     signedArtifacts := {
-      val artifacts = packagedArtifacts.value
-      val r = pgpSigner.value
-      val skipZ = (pgpSigner / skip).value
-      val s = streams.value
-      if (!skipZ) {
+      if (!(pgpSigner / skip).value) {
+        val artifacts = packagedArtifacts.value
+        val r = pgpSigner.value
+        val s = streams.value
         artifacts flatMap {
           case (art, file) =>
             Seq(
@@ -60,7 +60,7 @@ object Compat {
                 .sign(file, new File(file.getAbsolutePath + gpgExtension), s)
             )
         }
-      } else artifacts
+      } else packagedArtifacts.value
     }
   )
 
