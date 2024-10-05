@@ -54,7 +54,7 @@ class SecretKeyRingCollection(val nested: PGPSecretKeyRingCollection) extends St
 }
 
 object SecretKeyRingCollection extends StreamingLoadable[SecretKeyRingCollection] {
-  implicit def unwrap(ring: SecretKeyRingCollection) = ring.nested
+  implicit def unwrap(ring: SecretKeyRingCollection): PGPSecretKeyRingCollection = ring.nested
   def apply(nested: PGPSecretKeyRingCollection) = new SecretKeyRingCollection(nested)
   def load(input: InputStream) =
     apply(new PGPSecretKeyRingCollection(PGPUtil.getDecoderStream(input), new BcKeyFingerprintCalculator))

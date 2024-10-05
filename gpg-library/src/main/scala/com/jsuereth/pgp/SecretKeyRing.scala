@@ -45,7 +45,7 @@ class SecretKeyRing(val nested: PGPSecretKeyRing) extends StreamingSaveable {
 }
 
 object SecretKeyRing extends StreamingLoadable[SecretKeyRing] {
-  implicit def unwrap(ring: SecretKeyRing) = ring.nested
+  implicit def unwrap(ring: SecretKeyRing): PGPSecretKeyRing = ring.nested
   def apply(ring: PGPSecretKeyRing) = new SecretKeyRing(ring)
   // TODO - Another way of generating SecretKeyRing from SecretKey objects.
   def load(input: InputStream) =
