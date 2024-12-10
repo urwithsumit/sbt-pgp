@@ -50,6 +50,12 @@ lazy val plugin = (project in file("sbt-pgp"))
         case "2.12" => "1.5.8"
         case _      => "2.0.0-M2"
       }
+    },
+    scriptedSbt := {
+      scalaBinaryVersion.value match {
+        case "2.12" => "1.10.6"
+        case _      => (pluginCrossBuild / sbtVersion).value
+      }
     }
   )
 
