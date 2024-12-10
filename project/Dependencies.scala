@@ -10,7 +10,7 @@ object Dependencies {
         "com.eed3si9n" %% "gigahorse-okhttp" % "0.7.0"
     }
   )
-  val bouncyCastlePgp = "org.bouncycastle" % "bcpg-jdk15on" % "1.69"
+  val bouncyCastlePgp = "org.bouncycastle" % "bcpg-jdk18on" % "1.78.1"
   val specs2 = "org.specs2" %% "specs2-core" % "4.20.8"
   val sbtIo = "org.scala-sbt" %% "io" % "1.10.0"
   val parserCombinators = Def.setting(
